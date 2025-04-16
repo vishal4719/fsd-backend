@@ -9,6 +9,7 @@ import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -29,6 +30,9 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/auth")
 public class PublicController {
+    @Value("${FRONTEND_URL}")
+private String frontendUrl;
+
 
     @Autowired
     private UserService userService;
@@ -164,8 +168,8 @@ public class PublicController {
             String token = UUID.randomUUID().toString();
             userService.createPasswordResetTokenForUser(u, token);
 
-            // Prepare email content
-            String resetUrl = "http://localhost:4200/reset-password?token=" + token;
+            String resetUrl = frontendUrl + "/reset-password?token=" + token;
+
 
             String emailContent = "<html><body>" +
                     "<h2>Password Reset Request</h2>" +
