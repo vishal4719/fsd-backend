@@ -1,0 +1,1 @@
+import{Ma as n,Na as i,Sa as p,za as t}from"./chunk-L5ZCWPZT.js";var r=class o{static \u0275fac=function(e){return new(e||o)};static \u0275cmp=t({type:o,selectors:[["app-profile"]],decls:2,vars:0,template:function(e,a){e&1&&(n(0,"p"),p(1,"Currently in Profile Page!"),i())},encapsulation:2})};export{r as ProfileComponent};

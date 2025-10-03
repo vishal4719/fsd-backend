@@ -30,8 +30,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/auth")
 public class PublicController {
-    @Value("${FRONTEND_URL}")
-private String frontendUrl;
+
 
 
     @Autowired
@@ -72,9 +71,14 @@ private String frontendUrl;
                 return ResponseEntity.badRequest().body(Map.of("error", "Phone no should be of 10 digits"+user.getPhone_no()+"length is: "+user.getPhone_no().length()));
             }
 
-            // Set default role if not provided
+            // Set default role if not provided or if it's null/empty
             if (user.getRoles() == null || user.getRoles().trim().isEmpty()) {
                 user.setRoles("USER");
+            }
+
+            // Also set the role field (if it exists in your User entity)
+            if (user.getRoles() == null || user.getRoles().trim().isEmpty()) {
+                user.setRoles(user.getRoles()); // Copy the value from roles to role
             }
 
             user.setDate(LocalDateTime.now());
@@ -168,7 +172,7 @@ private String frontendUrl;
             String token = UUID.randomUUID().toString();
             userService.createPasswordResetTokenForUser(u, token);
 
-            String resetUrl = frontendUrl + "/reset-password?token=" + token;
+            String resetUrl =   "198.96.89.132:8080/reset-password?token=" + token;
 
 
             String emailContent = "<html><body>" +

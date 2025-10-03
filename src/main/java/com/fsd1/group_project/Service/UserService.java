@@ -15,23 +15,31 @@ import java.util.Optional;
 public class UserService {
     @Autowired
     private UserRepository userRepository;
-   @Autowired
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
+
     public void saveNewUser(User user) {
         userRepository.save(user);
     }
 
+    public List<User> getAll(){
+        return userRepository.findAll();
+    }
 
-    public List<User>getAll(){
-       return  userRepository.findAll();
-}
     public Optional<User> findByEmail(String email) {
         return Optional.ofNullable(userRepository.findByEmail(email));
+    }
+
+    // Add this method to fix the error
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
     public User getUserByPasswordResetToken(String token) {
         return userRepository.findByResetToken(token);
     }
+
     public void createPasswordResetTokenForUser(User user, String token) {
         // Invalidate any existing token
         user.setResetToken(token);
@@ -69,7 +77,4 @@ public class UserService {
         user.setTokenCreationDate(null);
         userRepository.save(user);
     }
-
-
-
 }

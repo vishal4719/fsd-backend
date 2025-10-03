@@ -1,16 +1,15 @@
 package com.fsd1.group_project.Config;
 
 import com.fsd1.group_project.Filter.JwtFilter;
+import com.fsd1.group_project.Service.ParticipationService;
 import com.fsd1.group_project.Service.UserDetailsServiceImpl;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -23,15 +22,15 @@ import java.util.Arrays;
 
 @Configuration
 public class SecurityConfig {
-    @Value("${FRONTEND_URL}")
-    private String frontendUrl;
-
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
     @Autowired
     private JwtFilter jwtFilter;
+
+    @Autowired
+    private ParticipationService participationService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -47,11 +46,15 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> {}) // enable CORS (use empty lambda instead of .cors().and())
+                .cors(cors -> {})
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/roles/user").hasRole("USER")
+                        .requestMatchers("/", "/index.html", "/assets/**", "/static/**", "*.js", "*.css").permitAll()
+                        .requestMatchers("/participation-form", "/dashboard").permitAll() // Allow access to HTML templates
+                        .requestMatchers("/api/roles/user").hasAnyRole("USER")
                         .requestMatchers("/api/roles/task-manager").hasRole("TASK_MANAGER")
+                        .requestMatchers("/api/participation/**").hasRole("USER")
+                        .requestMatchers("/api/dashboard").hasAnyRole("USER", "TASK_MANAGER")
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception
@@ -70,7 +73,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.asList(frontendUrl)); // Loaded from .env
+        config.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(Arrays.asList("*"));
         config.setAllowCredentials(true);
